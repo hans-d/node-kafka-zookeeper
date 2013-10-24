@@ -1,50 +1,69 @@
 {
-  "name": "kafka-zookeeper",
+  "name": "kafkazoo",
   "description": "A high-level client library in Node.js for the Apache Kafka project with Zookeeper integration",
-  "keywords": [ "kafka", "producer", "consumer", "zookeeper", "apache" ],
-  "version": "0.0.14",
+  "keywords": [
+    "kafka",
+    "producer",
+    "consumer",
+    "zookeeper",
+    "apache"
+  ],
+  "version": "0.0.0",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/devoncrouse/node-kafka-zookeeper.git"
+    "type": "git",
+    "url": "https://github.com/hans-d/node-kafka-zookeeper.git"
   },
   "bugs": {
-    "url": "https://github.com/devoncrouse/node-kafka-zookeeper/issues"
+    "url": "https://github.com/hans-d/node-kafka-zookeeper/issues"
   },
+  "main": "js/src/index.js",
   "scripts": {
-    "test": "make test"
+    "test": "node_modules/.bin/grunt test:spec"
   },
   "maintainers": [
     {
-      "name": "Devon Crouse",
-      "email": "devoncrouse@gmail.com"
+      "name": "Hans Donner"
     }
   ],
   "contributors": [
     {
-      "name": "Hans Donner"
+      "name": "Devon Crouse",
+      "email": "devoncrouse@gmail.com"
     }
   ],
   "engines": {
     "node": ">=0.10.18"
   },
   "dependencies": {
+    "async": "0.2.x",
+    "bignum": "0.6.x",
+    "node-uuid": "~1.4.x",
     "prozess": "0.6.x",
-    "zookeeper": "3.4.x",
-    "optimist": "0.6.x",
     "underscore": "1.5.x",
     "underscore.string": "2.3.x",
-    "bignum": "0.6.x",
-    "async": "0.2.x"
+    "zookeeper-hd": "~0.3.x"
   },
   "devDependencies": {
-    "winston": "0.7.x",
-    "jscoverage": "0.3.x",
-    "coveralls": "1.1.x",
-    "mockery": "1.4.x",
-    "hottap": "1.0.x",
-    "mocha": "1.3.x",
-    "should": "1.1.x",
-    "sinon": "1.5.x",
-    "buffermaker": "0.0.x"
+    "blanket": "~1.1.5",
+    "buffermaker": "~1.0",
+    "concat-stream": "~1.0",
+    "glob": "~3.2",
+    "grunt": "~0.4",
+    "grunt-banner": "~0.2",
+    "grunt-bumpup": "~0.4",
+    "grunt-cli": "~0.1",
+    "grunt-contrib-clean": "~0.5",
+    "grunt-contrib-coffee": "~0.7",
+    "grunt-contrib-watch": "~0.5",
+    "grunt-mocha-test": "~0.7",
+    "load-grunt-tasks": "~0.1",
+    "mocha": "~1.3",
+    "mockery": "~1.4",
+    "optimist": "~0.6",
+    "semver-sync": "~1.2",
+    "shelljs": "~0.2",
+    "should": "~1.1",
+    "sinon": "~1.5",
+    "yadda": "~0.8"
   }
 }

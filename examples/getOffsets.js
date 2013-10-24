@@ -49,7 +49,7 @@ var onConsumerOffsets = function (error, offsets) {
 
 // how to get the offset information
 var getConsumerOffsets = function () {
-    kafka.getConsumerOffsets(argv.topic, argv.group, onConsumerOffsets);
+    kafka.getConsumerOffsetParents(argv.topic, argv.group, onConsumerOffsets);
 };
 
 // do it
