@@ -1,10 +1,14 @@
-node-kafka-zookeeper
+kafkazoo
 =======
 
 A high-level client library in Node.js for the Apache Kafka project with Zookeeper integration
 
-[Kafka](http://incubator.apache.org/kafka/index.html) is a persistent, efficient, distributed publish/subscribe messaging system.  
-[Prozess](https://github.com/cainus/Prozess) is a Kafka client library used for low-level access from node-kafka-zookeeper.
+
+[Kafka](http://incubator.apache.org/kafka/index.html) is a persistent, efficient, distributed publish/subscribe
+messaging system.
+
+[kafka-zookeeper](https://github.com/devoncrouse/node-kafka-zookeeper.git) is the original module where this is
+based on, but completely rewritten and moved to coffeescript (but delivery is still .js)
 
 ###Consumer example:
 
@@ -74,22 +78,3 @@ kafka.initializeConsumerOffsets(topic, group, onInitializeConsumerOffsets);
   git clone https://github.com/devoncrouse/node-kafka-zookeeper.git  
   cd node-kafka-zookeeper; npm test
 
-###Kafka Compatability matrix:
-
-<table>
-  <tr>
-     <td>Kakfa 0.8.0 Release</td><td>Not Supported</td>
-  </tr>
-  <tr>
-    <td>Kafka 0.7.2 Release</td><td>Supported</td>
-  <tr>
-    <td>Kafka 0.7.1 Release</td><td>Supported</td>
-  <tr>
-    <td>Kafka 0.7.0 Release</td><td>Supported</td>
-  <tr>
-    <td>kafka-0.6</td><td>Consumer-only support.</td>
-  <tr>
-    <td>kafka-0.05</td><td>Not Supported</td>
-</table>
-
-Versions taken from http://incubator.apache.org/kafka/downloads.html
