@@ -241,7 +241,7 @@ describe 'PartitionConsumer class', ->
             detail.should.equal 'foo error'
             done()
 
-          partitionConsumer.onConsumptionError partitionConsumer, 'foo error'
+          partitionConsumer.onConsumptionError 'foo error'
 
   describe 'readable stream', ->
 
@@ -469,7 +469,7 @@ describe 'PartitionConsumer class', ->
           partitionConsumer.consumeNext();
 
           delegated.calledOnce.should.be.true;
-          delegated.calledWith(partitionConsumer).should.be.true;
+          delegated.calledWith().should.be.true;
 
         it 'should try another consumeNext by default', ->
           sinon.spy(partitionConsumer.consumer, 'consume');
@@ -501,7 +501,7 @@ describe 'PartitionConsumer class', ->
           partitionConsumer.consumeNext()
 
           delegated.calledOnce.should.be.true
-          delegated.calledWith(partitionConsumer, 'foo!').should.be.true
+          delegated.calledWith('foo!').should.be.true
 
         it 'should emit error event by default', ->
           error = false;
@@ -553,7 +553,6 @@ describe 'PartitionConsumer class', ->
           partitionConsumer.consumeNext()
 
           delegated.calledOnce.should.be.true
-          delegated.calledWith(partitionConsumer).should.be.true
 
         it 'should retry consume by default (after a timeout)', ->
           sinon.spy partitionConsumer, 'consumeNext'

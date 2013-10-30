@@ -78,23 +78,25 @@ module.exports = PartitionConsumer = (function(_super) {
 
 
   PartitionConsumer.prototype._defineHandlers = function(options) {
-    this.onNoMessages = options.onNoMessages || function(this_) {
+    this.onNoMessages = options.onNoMessages || function() {
+      var _this = this;
       return setTimeout(function() {
-        return this_.consumeNext();
+        return _this.consumeNext();
       }, options.noMessagesTimeout || 2000);
     };
-    this.onOffsetOutOfRange = options.onOffsetOutOfRange || function(this_) {
-      return this_.consumer.getLatestOffset(function(error, offset) {
+    this.onOffsetOutOfRange = options.onOffsetOutOfRange || function() {
+      var _this = this;
+      return this.consumer.getLatestOffset(function(error, offset) {
         if (error) {
-          return this_.fatal('retrieving latest offset', error);
+          return _this.fatal('retrieving latest offset', error);
         }
-        return this_._registerConsumerOffset(offset, function() {
-          return this_.consumeNext();
+        return _this._registerConsumerOffset(offset, function() {
+          return _this.consumeNext();
         });
       });
     };
-    return this.onConsumptionError = options.onConsumptionError || function(this_, error) {
-      return this_.fatal('on consumption', error);
+    return this.onConsumptionError = options.onConsumptionError || function(error) {
+      return this.fatal('on consumption', error);
     };
   };
 
@@ -198,13 +200,13 @@ module.exports = PartitionConsumer = (function(_super) {
       _this.emit('consumed', error, messages, meta);
       if (error) {
         if (error.message !== 'OffsetOutOfRange') {
-          return _this.onConsumptionError(_this, error);
+          return _this.onConsumptionError.apply(_this, [error]);
         }
         _this.emit('offsetOutOfRange', _this.partitionDetails.offset);
-        return _this.onOffsetOutOfRange(_this);
+        return _this.onOffsetOutOfRange.apply(_this);
       }
       if (messages.length === 0) {
-        return _this.onNoMessages(_this);
+        return _this.onNoMessages.apply(_this);
       }
       return _this.push({
         messages: messages,

@@ -57,19 +57,19 @@ module.exports = class PartitionConsumer extends Readable
   ###
   _defineHandlers: (options) ->
 
-    @onNoMessages = options.onNoMessages || (this_) ->
-      setTimeout ->
-        this_.consumeNext()
+    @onNoMessages = options.onNoMessages || () ->
+      setTimeout =>
+        @consumeNext()
       , options.noMessagesTimeout || 2000
 
-    @onOffsetOutOfRange = options.onOffsetOutOfRange || (this_) ->
-      this_.consumer.getLatestOffset (error, offset) ->
-        return this_.fatal 'retrieving latest offset', error if error
-        this_._registerConsumerOffset offset, ->
-          this_.consumeNext()
+    @onOffsetOutOfRange = options.onOffsetOutOfRange || () ->
+      @consumer.getLatestOffset (error, offset) =>
+        return @fatal 'retrieving latest offset', error if error
+        @._registerConsumerOffset offset, =>
+          @consumeNext()
 
-    @onConsumptionError = options.onConsumptionError || (this_, error) ->
-      this_.fatal 'on consumption', error
+    @onConsumptionError = options.onConsumptionError || (error) ->
+      @fatal 'on consumption', error
 
 
   ###
@@ -152,12 +152,12 @@ module.exports = class PartitionConsumer extends Readable
       @emit 'consumed', error, messages, meta
 
       if error
-        return @onConsumptionError @, error if error.message != 'OffsetOutOfRange'
+        return @onConsumptionError.apply @, [error] if error.message != 'OffsetOutOfRange'
 
         @emit 'offsetOutOfRange', @partitionDetails.offset
-        return @onOffsetOutOfRange @
+        return @onOffsetOutOfRange.apply @
 
-      return @onNoMessages @ if messages.length == 0
+      return @onNoMessages.apply @ if messages.length == 0
 
       @push
         messages: messages

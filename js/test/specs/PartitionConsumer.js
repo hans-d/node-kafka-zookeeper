@@ -277,7 +277,7 @@ describe('PartitionConsumer class', function() {
             detail.should.equal('foo error');
             return done();
           });
-          return partitionConsumer.onConsumptionError(partitionConsumer, 'foo error');
+          return partitionConsumer.onConsumptionError('foo error');
         });
       });
     });
@@ -535,7 +535,7 @@ describe('PartitionConsumer class', function() {
           delegated = partitionConsumer.onOffsetOutOfRange = sinon.stub();
           partitionConsumer.consumeNext();
           delegated.calledOnce.should.be["true"];
-          return delegated.calledWith(partitionConsumer).should.be["true"];
+          return delegated.calledWith().should.be["true"];
         });
         it('should try another consumeNext by default', function() {
           sinon.spy(partitionConsumer.consumer, 'consume');
@@ -562,7 +562,7 @@ describe('PartitionConsumer class', function() {
           delegated = partitionConsumer.onConsumptionError = sinon.stub();
           partitionConsumer.consumeNext();
           delegated.calledOnce.should.be["true"];
-          return delegated.calledWith(partitionConsumer, 'foo!').should.be["true"];
+          return delegated.calledWith('foo!').should.be["true"];
         });
         it('should emit error event by default', function() {
           var error;
@@ -614,8 +614,7 @@ describe('PartitionConsumer class', function() {
           var delegated;
           delegated = partitionConsumer.onNoMessages = sinon.stub();
           partitionConsumer.consumeNext();
-          delegated.calledOnce.should.be["true"];
-          return delegated.calledWith(partitionConsumer).should.be["true"];
+          return delegated.calledOnce.should.be["true"];
         });
         it('should retry consume by default (after a timeout)', function() {
           sinon.spy(partitionConsumer, 'consumeNext');
