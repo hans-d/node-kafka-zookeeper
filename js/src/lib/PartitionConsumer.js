@@ -12,12 +12,27 @@ Consumer = require('prozess').Consumer;
 
 _ = require('underscore');
 
+/*
+  Utility function to create properties for a class
+*/
+
+
 Function.prototype.property = function(prop, desc) {
   return Object.defineProperty(this.prototype, prop, desc);
 };
 
+/*
+  Consumer for a specific topic partition. Wraps the underlying Prozess client.
+*/
+
+
 module.exports = PartitionConsumer = (function(_super) {
   __extends(PartitionConsumer, _super);
+
+  /*
+    Current offset, as reported by Prozess client
+  */
+
 
   PartitionConsumer.property('offset', {
     get: function() {
@@ -28,6 +43,11 @@ module.exports = PartitionConsumer = (function(_super) {
       }
     }
   });
+
+  /*
+    Constructs the partition consumer
+  */
+
 
   function PartitionConsumer(topicConsumer, topicPartition, options) {
     PartitionConsumer.__super__.constructor.call(this, {
@@ -52,6 +72,11 @@ module.exports = PartitionConsumer = (function(_super) {
     }
   }
 
+  /*
+    Sets up default event handlers (part of construction).
+  */
+
+
   PartitionConsumer.prototype._defineHandlers = function(options) {
     this.onNoMessages = options.onNoMessages || function(this_) {
       return setTimeout(function() {
@@ -72,6 +97,11 @@ module.exports = PartitionConsumer = (function(_super) {
       return this_.fatal('on consumption', error);
     };
   };
+
+  /*
+    Connects to Kafka
+  */
+
 
   PartitionConsumer.prototype.connect = function() {
     var _this = this;
@@ -101,25 +131,57 @@ module.exports = PartitionConsumer = (function(_super) {
     });
   };
 
+  /*
+    Disconnects from Kafka
+  */
+
+
   PartitionConsumer.prototype.disconnect = function() {
     return this.consumer = null;
   };
+
+  /*
+    Shut down consumer
+  */
+
 
   PartitionConsumer.prototype.shutdown = function() {
     this.disconnect();
     return this.push(null);
   };
 
+  /*
+    Utility function
+  */
+
+
   PartitionConsumer.prototype._getPartitionConnectionAndOffsetDetails = function(onData) {
     return this.zooKafka.getPartitionConnectionAndOffsetDetails(this.consumerGroup, this.topicPartition, onData);
   };
+
+  /*
+    Utility function
+  */
+
 
   PartitionConsumer.prototype._registerConsumerOffset = function(offset, onReady) {
     this.zooKafka.registerConsumerOffset(this.consumerGroup, this.topicPartition, offset, onReady);
     return this.emit('offsetUpdate', offset, this.partitionDetails.offset);
   };
 
+  /*
+    Dummy implementation of stream.Readable#_read
+  */
+
+
   PartitionConsumer.prototype._read = function() {};
+
+  /*
+    Consume from Kafka.
+  
+    Kafka 0.7 is currently polling only.
+  */
+
 
   PartitionConsumer.prototype.consumeNext = function() {
     var _this = this;
@@ -150,6 +212,11 @@ module.exports = PartitionConsumer = (function(_super) {
       });
     });
   };
+
+  /*
+    Utility method
+  */
+
 
   PartitionConsumer.prototype.fatal = function(msg, detail) {
     return this.emit('error', msg, detail);

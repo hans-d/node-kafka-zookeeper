@@ -160,7 +160,7 @@ describe('Kafkazoo class', function() {
       return triggered.should.be["true"];
     });
   });
-  return describe('createConsumer', function() {
+  describe('createConsumer', function() {
     it('should create a topic consumer with given group and topic', function() {
       kafka.createConsumer('topic', 'group');
       return stubbed['topicConsumer']._initArgs.should.include({
@@ -171,6 +171,11 @@ describe('Kafkazoo class', function() {
     return it('should add created topic consumer to kafka connections', function() {
       kafka.createConsumer('topic', 'group');
       return kafka.connections.topicConsumer.should.have.keys('group-topic');
+    });
+  });
+  return describe('createProducer', function() {
+    return it('should create a producer wfor a given topic', function() {
+      return kafka.createProducer('topic');
     });
   });
 });

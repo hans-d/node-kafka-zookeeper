@@ -65,7 +65,7 @@ describe('Topic consumer', function() {
     });
     mockery.registerMock('node-uuid', NodeUuidStub);
     mockery.registerMock('./PartitionConsumer', PartitionConsumerStub);
-    mockery.registerMock('./rebalanceStrategy/Standalone', StrategyStub);
+    mockery.registerMock('./rebalanceStrategies/StandaloneStrategy', StrategyStub);
     mockery.registerAllowables(['stream', 'util', 'async', 'underscore', 'zlib', 'crypto', './Compression', '../../src/lib/TopicConsumer']);
     return TopicConsumer = require('../../src/lib/TopicConsumer');
   });

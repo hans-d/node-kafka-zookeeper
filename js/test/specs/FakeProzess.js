@@ -4,7 +4,7 @@ var FakeProzess, should;
 
 should = require('should');
 
-FakeProzess = require('../../src/index').FakeProzess;
+FakeProzess = require('../../src/lib/FakeProzess');
 
 describe('FakeProzess', function() {
   beforeEach(function() {

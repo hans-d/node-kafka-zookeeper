@@ -6,9 +6,9 @@ var Brokers, Consumer, ERR_InvalidFetchSize, ERR_InvalidMessage, ERR_OffsetOutOf
 
 EventEmitter = require('events').EventEmitter;
 
-_ = require('underscore');
-
 Message = require('prozess').Message;
+
+_ = require('underscore');
 
 ERR_Unknown = new Error("Unknown");
 
@@ -22,6 +22,16 @@ ERR_InvalidFetchSize = new Error("InvalidFetchSize");
 
 ERR_Other = new Error("Unknown error code: 99");
 
+/*
+  Fakes a set of kafka brokers
+
+  Queues are memory based and implemented using Arrays.
+  Writes pushes the provided messages into the queue.
+  Offsets are related to the queue offset in the array (any calculation using the
+  offset and message length will fail)
+*/
+
+
 exports.Brokers = Brokers = (function() {
   var Broker, brokers;
 
@@ -29,10 +39,26 @@ exports.Brokers = Brokers = (function() {
 
   brokers = {};
 
+  /*
+    Fake broker, holds the queues for a broker.
+  
+    Topics are keys of the queue
+  */
+
+
   Broker = (function() {
+    /*
+      Constructs a broker
+    */
+
     function Broker() {
       this.queues = {};
     }
+
+    /*
+      Adds messages for topic-partition to the queue
+    */
+
 
     Broker.prototype.write = function(topic, partition, messages) {
       var key, message, _i, _len, _results;
@@ -47,6 +73,14 @@ exports.Brokers = Brokers = (function() {
       }
       return _results;
     };
+
+    /*
+      Retrieves messages from the queue.
+    
+      Provides error on offset out of range
+      Uses maxMessageSize to batch messages
+    */
+
 
     Broker.prototype.read = function(topic, partition, offset, maxMessageSize, onData) {
       var item, key, length,
@@ -68,6 +102,11 @@ exports.Brokers = Brokers = (function() {
       return onData(null, batch);
     };
 
+    /*
+      Gets the latests offset
+    */
+
+
     Broker.prototype.getLatestOffset = function(topic, partition) {
       var key;
       key = "" + topic + "-" + partition;
@@ -78,6 +117,13 @@ exports.Brokers = Brokers = (function() {
 
   })();
 
+  /*
+    Connects to a fake broker.
+  
+    Will create the broker if not exists, otherwise will use the existing broker
+  */
+
+
   Brokers.connect = function(host, port) {
     var broker;
     broker = "" + host + ":" + port;
@@ -87,9 +133,21 @@ exports.Brokers = Brokers = (function() {
     return brokers[broker];
   };
 
+  /*
+    Returns all connected brokers
+  */
+
+
   Brokers.getBrokers = function() {
     return brokers;
   };
+
+  /*
+    Removes all brokers and their queues.
+  
+    For testing purposes
+  */
+
 
   Brokers.reset = function() {
     return brokers = {};
@@ -99,8 +157,20 @@ exports.Brokers = Brokers = (function() {
 
 })();
 
+/*
+  Fake producer, interacts with the fake broker(s)
+
+  API compatible with Prozess module
+*/
+
+
 exports.Producer = Producer = (function(_super) {
   __extends(Producer, _super);
+
+  /*
+    Construct producer
+  */
+
 
   function Producer(topic, options) {
     options = options || {};
@@ -112,10 +182,20 @@ exports.Producer = Producer = (function(_super) {
     this.connection = null;
   }
 
+  /*
+    Connects to a broker
+  */
+
+
   Producer.prototype.connect = function() {
     this.broker = Brokers.connect(this.host, this.port);
     return this.emit('connect');
   };
+
+  /*
+    Send (produce) a message to the broker
+  */
+
 
   Producer.prototype.send = function(message, options, cb) {
     var messages;
@@ -133,7 +213,18 @@ exports.Producer = Producer = (function(_super) {
 
 })(EventEmitter);
 
+/*
+  Fake consumer, interacts with the fake broker(s)
+
+  API compatible with zookeeper module
+*/
+
+
 exports.Consumer = Consumer = (function() {
+  /*
+    Constructs the consumer
+  */
+
   function Consumer(options) {
     options = options || {};
     this.topic = options.topic || 'test';
@@ -145,9 +236,19 @@ exports.Consumer = Consumer = (function() {
     this.polling = options.polling || 2;
   }
 
+  /*
+    Connects to the fake broker
+  */
+
+
   Consumer.prototype.connect = function() {
     return this.broker = Brokers.connect(this.host, this.port);
   };
+
+  /*
+    Consume (read) messages from the broker
+  */
+
 
   Consumer.prototype.consume = function(cb) {
     return this.broker.read(this.topic, this.partition, this.offset, this.maxMessageSize, function(err, messages) {
@@ -159,6 +260,11 @@ exports.Consumer = Consumer = (function() {
     });
   };
 
+  /*
+    Returns latests offset
+  */
+
+
   Consumer.prototype.getLatestOffset = function(cb) {
     return cb(null, this.brokers.getLatestOffset(this.topic, this.partition));
   };
@@ -167,12 +273,22 @@ exports.Consumer = Consumer = (function() {
 
 })();
 
+/*
+  Utility function to turn messages into an array
+*/
+
+
 toArray = function(arg) {
   if (_.isArray(arg)) {
     return arg;
   }
   return [arg];
 };
+
+/*
+  Utility function to create real Kafka Message objects
+*/
+
 
 toListOfMessages = function(args) {
   return _.map(args, function(arg) {

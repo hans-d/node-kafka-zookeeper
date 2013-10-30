@@ -44,7 +44,7 @@ describe 'Decompressor', ->
 
     it 'onErrorDecompressing continues with error', (done) ->
       providedDetails = foo: 'bar'
-      decompressor.onErrorDecompressing decompressor, {}, 'foo error', providedDetails, (err) ->
+      decompressor.onErrorDecompressing decompressor, 'foo error', providedDetails, (err) ->
         err.msg.should.equal 'foo error'
         err.detail.should.equal providedDetails
         done()
@@ -73,7 +73,10 @@ describe 'Decompressor', ->
     decompressor.on 'readable', ->
       result = decompressor.read()
       result.should.eql
-        messages: [original1, original2, original1, original2]
+        messages: [
+          [original1, original2],
+          [original1, original2]
+        ]
         offset: '123'
       done()
 
@@ -106,7 +109,10 @@ describe 'Decompressor', ->
     decompressor.on 'readable', ->
       result = decompressor.read()
       result.should.eql
-        messages: [payload1, original1, original2, payload2]
+        messages: [
+          payload1,
+          [original1, original2],
+          payload2]
         offset: '123'
       done()
 

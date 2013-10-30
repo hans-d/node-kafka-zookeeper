@@ -50,7 +50,7 @@ describe('Decompressor', function() {
       providedDetails = {
         foo: 'bar'
       };
-      return decompressor.onErrorDecompressing(decompressor, {}, 'foo error', providedDetails, function(err) {
+      return decompressor.onErrorDecompressing(decompressor, 'foo error', providedDetails, function(err) {
         err.msg.should.equal('foo error');
         err.detail.should.equal(providedDetails);
         return done();
@@ -86,7 +86,7 @@ describe('Decompressor', function() {
       var result;
       result = decompressor.read();
       result.should.eql({
-        messages: [original1, original2, original1, original2],
+        messages: [[original1, original2], [original1, original2]],
         offset: '123'
       });
       return done();
@@ -131,7 +131,7 @@ describe('Decompressor', function() {
       var result;
       result = decompressor.read();
       result.should.eql({
-        messages: [payload1, original1, original2, payload2],
+        messages: [payload1, [original1, original2], payload2],
         offset: '123'
       });
       return done();

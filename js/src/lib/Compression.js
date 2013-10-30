@@ -6,28 +6,58 @@ var Decompressor, Transform, async, util, zlib, _,
 
 Transform = require('stream').Transform;
 
-async = require('async');
-
 zlib = require('zlib');
 
 util = require('util');
 
+async = require('async');
+
 _ = require('underscore');
+
+/*
+  Decompressing messages received from Kafka
+
+  Transformation stream
+
+  TODO: implement snappy
+*/
+
 
 exports.Decompressor = Decompressor = (function(_super) {
   __extends(Decompressor, _super);
+
+  /*
+    Constructs the decompressor.
+  
+        onErrorDecompressing: function(message, error, detail, next) {
+          next({msg: error, detail: detail});
+        };
+  
+    @param {Object} options (optional)
+    @param {Function} options.onErrorDecompressing (optional)
+  */
+
 
   function Decompressor(options) {
     options = options || {};
     options.objectMode = true;
     Decompressor.__super__.constructor.call(this, options);
-    this.onErrorDecompressing = options.onErrorDecompressing || function(this_, message, error, detail, next) {
+    this.onErrorDecompressing = options.onErrorDecompressing || function(message, error, detail, next) {
       return next({
         msg: error,
         detail: detail
       });
     };
   }
+
+  /*
+    Transformation
+  
+    If an error is encountered during decompression, calls #onErrorDecompressing
+  
+    @see stream.Transform#_transform
+  */
+
 
   Decompressor.prototype._transform = function(data, encoding, done) {
     var _this = this;
@@ -42,7 +72,7 @@ exports.Decompressor = Decompressor = (function(_super) {
           return zlib.gunzip(message.payload, function(error, buffer) {
             var batched, endpos, msg, size;
             if (error) {
-              return _this.onErrorDecompressing(_this, message, 'Error unzipping', error, asyncReady);
+              return _this.onErrorDecompressing.apply(_this, [message, 'Error unzipping', error, asyncReady]);
             }
             batched = (function() {
               var _results;
@@ -59,15 +89,15 @@ exports.Decompressor = Decompressor = (function(_super) {
             return asyncReady(null, batched);
           });
         case 2:
-          return _this.onErrorDecompressing(_this, message, 'Snappy not implemented', null, asyncReady);
+          return _this.onErrorDecompressing.apply(_this, [message, 'Snappy not implemented', null, asyncReady]);
         default:
-          return _this.onErrorDecompressing(_this, message, 'Unknown compression: ' + message.compression, null, asyncReady);
+          return _this.onErrorDecompressing.apply(_this, [message, 'Unknown compression: ' + message.compression, null, asyncReady]);
       }
     }, function(error, results) {
       if (error) {
         return _this.fatal('decompressing', error);
       }
-      data.messages = _.flatten(results);
+      data.messages = results;
       _this.push(data);
       return done();
     });

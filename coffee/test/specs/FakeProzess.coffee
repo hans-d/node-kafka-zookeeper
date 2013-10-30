@@ -1,5 +1,5 @@
 should = require 'should'
-{FakeProzess} = require '../../src/index'
+FakeProzess = require '../../src/lib/FakeProzess'
 
 describe 'FakeProzess', ->
 

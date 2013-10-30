@@ -143,3 +143,11 @@ describe 'Kafkazoo class', ->
       kafka.createConsumer 'topic', 'group'
 
       kafka.connections.topicConsumer.should.have.keys 'group-topic'
+
+
+  describe 'createProducer', ->
+
+    it 'should create a producer wfor a given topic', ->
+      kafka.createProducer 'topic'
+
+

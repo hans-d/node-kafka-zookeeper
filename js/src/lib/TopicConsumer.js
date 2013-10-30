@@ -18,10 +18,34 @@ Compression = require('./Compression');
 
 PartitionConsumer = require('./PartitionConsumer');
 
-StandaloneStrategy = require('./rebalanceStrategy/Standalone');
+StandaloneStrategy = require('./rebalanceStrategies/StandaloneStrategy');
+
+/*
+  Coordinates the consumption of the various partitions and brokers
+  where topic messages are stored.
+
+  Creation is done by {@link Kafakazoo), which provides a reference to the
+  created topic consumer.
+
+  Information about this is retrieved from zookeeper, which partitions and
+  brokers to consume is further determined by the rebalance strategy.
+*/
+
 
 module.exports = TopicConsumer = (function(_super) {
   __extends(TopicConsumer, _super);
+
+  /*
+    Constructs a topic consumer.
+  
+    @param {Object} connections Kafkazoo connections
+    @param {String} consumerGroup Kafka consumer group
+    @param {String} consumerGroup Kafka topic
+    @param {Object} options (optional)
+    @param {Object} options.rebalanceStrategy (optional) Rebalance strategy class
+      (defaults to StandaloneStrategy)
+  */
+
 
   function TopicConsumer(connections, consumerGroup, topic, options) {
     var rebalanceStrategy,
@@ -50,11 +74,36 @@ module.exports = TopicConsumer = (function(_super) {
     });
   }
 
+  /*
+    Connects to zookeeper and kafka.
+  
+    Delegates to the rebalance strategy to deliver the partitions to read from.
+    This is done via the ```partitions``` event, that fires #rebalance
+  */
+
+
   TopicConsumer.prototype.connect = function() {
     return this.rebalancer.connect();
   };
 
+  /*
+    Dummy implementation of stream.Readable#_read
+  
+    No automatic reading
+  */
+
+
   TopicConsumer.prototype._read = function() {};
+
+  /*
+    Connecting and disconnection the low level partition consumers, as provided by the
+    rebalance strategy,
+  
+    Currently only does initial connection
+  
+    TODO: implement rebalancing
+  */
+
 
   TopicConsumer.prototype.rebalance = function(partitions) {
     var _this = this;
@@ -66,6 +115,13 @@ module.exports = TopicConsumer = (function(_super) {
       return asyncReady();
     });
   };
+
+  /*
+    Construction of a partition consumer.
+  
+    Wires the various events
+  */
+
 
   TopicConsumer.prototype.connectPartitionConsumer = function(partition) {
     var event, id, partitionConsumer, _fn, _i, _len, _ref,
