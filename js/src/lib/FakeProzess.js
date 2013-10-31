@@ -10,6 +10,8 @@ Message = require('prozess').Message;
 
 _ = require('underscore');
 
+exports.Message = Message;
+
 ERR_Unknown = new Error("Unknown");
 
 ERR_OffsetOutOfRange = new Error("OffsetOutOfRange");

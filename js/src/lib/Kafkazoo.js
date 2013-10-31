@@ -1,6 +1,6 @@
 // This file has been generated from coffee source files
 
-var EventEmitter, Kafkazoo, TopicConsumer, ZooKafka, zookeeper, _,
+var Connections, EventEmitter, Kafkazoo, zookeeper, _,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -10,9 +10,7 @@ _ = require('underscore');
 
 zookeeper = require('zookeeper-hd');
 
-TopicConsumer = require('./TopicConsumer');
-
-ZooKafka = require('./ZooKafka');
+Connections = require('./Connections');
 
 /*
   Higher level client for kafka, that interacts with zookeeper.
@@ -53,11 +51,7 @@ module.exports = Kafkazoo = (function(_super) {
     });
     this._zookeeper = new zookeeper.PlusClient(options.zookeeper.clientConfig);
     this.config = _.omit(options, zookeeper);
-    this.connections = function() {};
-    this.connections.zooKafka = new ZooKafka(this._zookeeper);
-    this.connections.topicConsumer = {};
-    this.connections.topicProducer = {};
-    this.connections.brokerProducer = {};
+    this.connections = new Connections(this._zookeeper);
   }
 
   /*
@@ -99,7 +93,7 @@ module.exports = Kafkazoo = (function(_super) {
 
 
   Kafkazoo.prototype.createConsumer = function(topic, consumerGroup, options) {
-    return this.connections.topicConsumer["" + consumerGroup + "-" + topic] = new TopicConsumer(this.connections, consumerGroup, topic, options);
+    return this.connections.newTopicConsumer(consumerGroup, topic, options);
   };
 
   /*

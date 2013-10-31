@@ -1,6 +1,6 @@
 // This file has been generated from coffee source files
 
-var TopicConsumer, ZooKafka, mockery, should, sinon, _;
+var TopicConsumer, TopicProducer, ZooKafka, mockery, should, sinon, _;
 
 mockery = require('mockery');
 
@@ -11,6 +11,8 @@ sinon = require('sinon');
 _ = require('underscore');
 
 TopicConsumer = require('../../src/lib/TopicConsumer');
+
+TopicProducer = require('../../src/lib/TopicProducer');
 
 ZooKafka = require('../../src/lib/ZooKafka');
 
@@ -51,7 +53,10 @@ describe('Kafkazoo class', function() {
     mockery.registerMock('./TopicConsumer', stubbedClass('topicConsumer', function(stub) {
       return stub.connections = stub._initArgs[0];
     }));
-    mockery.registerAllowables(['../../src/lib/Kafkazoo', 'events', 'util', 'underscore']);
+    mockery.registerMock('./TopicProducer', stubbedClass('topicProducer', function(stub) {
+      return stub.connections = stub._initArgs[0];
+    }));
+    mockery.registerAllowables(['../../src/lib/Kafkazoo', './Connections', 'events', 'util', 'underscore']);
     return Kafkazoo = require('../../src/lib/Kafkazoo');
   });
   after(function() {
@@ -69,6 +74,7 @@ describe('Kafkazoo class', function() {
     })();
     kafkaConnectionsStub.zookafka = stubbed['zooKafka'];
     stubbed['topicConsumer'] = sinon.stub(new TopicConsumer(kafkaConnectionsStub));
+    stubbed['topicProducer'] = sinon.stub(new TopicProducer(kafkaConnectionsStub));
     return kafka = new Kafkazoo();
   });
   describe('construction', function() {

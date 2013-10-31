@@ -15,9 +15,8 @@ describe 'Topic consumer', ->
   StrategyStub = PartitionConsumerStub = NodeUuidStub = null
 
   before ->
-    class StrategyStub
-      on: ->
-      connect: ->
+    StrategyStub =
+      standAlone: () -> return
 
     class PartitionConsumerStub extends Readable
       constructor: ->
@@ -37,7 +36,7 @@ describe 'Topic consumer', ->
     mockery.enable useCleanCache: true
     mockery.registerMock 'node-uuid', NodeUuidStub
     mockery.registerMock './PartitionConsumer', PartitionConsumerStub
-    mockery.registerMock './rebalanceStrategies/StandaloneStrategy', StrategyStub
+    mockery.registerMock './rebalanceStrategy', StrategyStub
     mockery.registerAllowables [
       'stream', 'util',
       'async', 'underscore',
@@ -56,6 +55,7 @@ describe 'Topic consumer', ->
       tc.on 'error', (msg, detail) ->
         throw new Error "should not occur: #{msg} / #{detail}"
       tc
+
 
   beforeEach ->
     zkClientStub = sinon.stub()
@@ -76,6 +76,7 @@ describe 'Topic consumer', ->
     partitionConsumer.push
       messages: [ { compression:0, payload: 'foo' } ]
 
+
   describe 'construction', ->
 
     it 'can be constructed with defaults', ->
@@ -86,16 +87,17 @@ describe 'Topic consumer', ->
       topicConsumer.consumerId.should.equal uuidV1Stub
       topicConsumer.partitionConsumers.should.eql {}
 
-      topicConsumer.rebalancer.should.be.instanceOf StrategyStub
+      topicConsumer.rebalanceStrategy.should.be.equal StrategyStub.standAlone
 
-    it 'can be given a strategy class', ->
-      class StrategyStub2
-        on : ->
 
-      topicConsumer = new TopicConsumer zkClientStub, 'groupA', 'foo', rebalanceStrategy: StrategyStub2
+    it 'can be given a rebalancer strategy', ->
+      strategy = () -> @emit 'error', 'not called'
 
-      topicConsumer.rebalancer.should.not.be.instanceOf StrategyStub
-      topicConsumer.rebalancer.should.be.instanceOf StrategyStub2
+      topicConsumer = new TopicConsumer zkClientStub, 'groupA', 'foo', rebalanceStrategy: strategy
+
+      topicConsumer.rebalanceStrategy.should.not.be.equal StrategyStub.standAlone
+      topicConsumer.rebalanceStrategy.should.be.equal strategy
+
 
     it 'should stream data via preprocess', (done) ->
       topicConsumer.on 'data', (data) ->
@@ -105,14 +107,16 @@ describe 'Topic consumer', ->
       topicConsumer.preprocess.write
         messages: [{ compression:0, payload: 'foo'}]
 
+
   describe '#connect', ->
 
-    it 'should connect the used rebalance strategy', ->
-      sinon.spy topicConsumer.rebalancer, 'connect'
+    it 'should call the used rebalance strategy', ->
+      sinon.stub topicConsumer, 'rebalanceStrategy'
 
       topicConsumer.connect()
 
-      topicConsumer.rebalancer.connect.calledOnce.should.be.true
+      topicConsumer.rebalanceStrategy.calledOnce.should.be.true
+
 
   describe '#rebalance', ->
       partitions = null

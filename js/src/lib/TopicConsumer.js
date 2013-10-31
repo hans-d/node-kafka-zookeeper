@@ -1,6 +1,6 @@
 // This file has been generated from coffee source files
 
-var Compression, PartitionConsumer, Readable, StandaloneStrategy, TopicConsumer, async, util, uuid, _,
+var Compression, PartitionConsumer, Readable, TopicConsumer, async, rebalanceStrategy, util, uuid, _,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -18,7 +18,7 @@ Compression = require('./Compression');
 
 PartitionConsumer = require('./PartitionConsumer');
 
-StandaloneStrategy = require('./rebalanceStrategies/StandaloneStrategy');
+rebalanceStrategy = require('./rebalanceStrategy');
 
 /*
   Coordinates the consumption of the various partitions and brokers
@@ -48,8 +48,7 @@ module.exports = TopicConsumer = (function(_super) {
 
 
   function TopicConsumer(connections, consumerGroup, topic, options) {
-    var rebalanceStrategy,
-      _this = this;
+    var _this = this;
     TopicConsumer.__super__.constructor.call(this, {
       objectMode: true
     });
@@ -58,9 +57,8 @@ module.exports = TopicConsumer = (function(_super) {
     this.topic = topic;
     this.consumerGroup = consumerGroup;
     this.consumerId = options.consumerId || uuid.v1();
-    rebalanceStrategy = options.rebalanceStrategy || StandaloneStrategy;
-    this.rebalancer = new rebalanceStrategy(this.connections, this.consumerGroup, this.topic, this.consumerId);
-    this.rebalancer.on('partitions', this.rebalance);
+    this.rebalanceStrategy = options.rebalanceStrategy || rebalanceStrategy.standAlone;
+    this.on('partitions', this.rebalance);
     this.partitionConsumers = {};
     this.partitionConsumerConfig = {};
     this.preprocess = new Compression.Decompressor();
@@ -83,7 +81,7 @@ module.exports = TopicConsumer = (function(_super) {
 
 
   TopicConsumer.prototype.connect = function() {
-    return this.rebalancer.connect();
+    return this.rebalanceStrategy.apply(this);
   };
 
   /*

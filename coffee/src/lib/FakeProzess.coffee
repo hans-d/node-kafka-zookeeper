@@ -3,6 +3,7 @@
 {Message} = require 'prozess'
 _ = require 'underscore'
 
+exports.Message = Message
 
 ERR_Unknown = new Error "Unknown"
 ERR_OffsetOutOfRange = new Error "OffsetOutOfRange"

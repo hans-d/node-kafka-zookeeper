@@ -4,6 +4,7 @@ sinon = require 'sinon'
 _ = require 'underscore'
 
 TopicConsumer = require '../../src/lib/TopicConsumer'
+TopicProducer = require '../../src/lib/TopicProducer'
 ZooKafka = require '../../src/lib/ZooKafka'
 
 
@@ -30,10 +31,13 @@ describe 'Kafkazoo class', ->
     mockery.enable useCleanCache: true
     mockery.registerMock 'zookeeper-hd', ZookeeperClientModuleStub
     mockery.registerMock './ZooKafka', stubbedClass 'zooKafka'
-    mockery.registerMock './TopicConsumer', stubbedClass 'topicConsumer', (stub) ->
-      stub.connections = stub._initArgs[0]
+    mockery.registerMock './TopicConsumer',
+      stubbedClass 'topicConsumer', (stub) -> stub.connections = stub._initArgs[0]
+    mockery.registerMock './TopicProducer',
+      stubbedClass 'topicProducer', (stub) -> stub.connections = stub._initArgs[0]
+
     mockery.registerAllowables [
-        '../../src/lib/Kafkazoo',
+        '../../src/lib/Kafkazoo', './Connections',
         'events', 'util',
         'underscore',
     ]
@@ -51,6 +55,8 @@ describe 'Kafkazoo class', ->
     kafkaConnectionsStub.zookafka = stubbed['zooKafka'];
 
     stubbed['topicConsumer'] = sinon.stub new TopicConsumer kafkaConnectionsStub
+    stubbed['topicProducer'] = sinon.stub new TopicProducer kafkaConnectionsStub
+
 
     kafka = new Kafkazoo()
 

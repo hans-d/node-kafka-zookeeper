@@ -7,7 +7,7 @@ _ = require 'underscore'
 
 Compression = require './Compression'
 PartitionConsumer = require './PartitionConsumer'
-StandaloneStrategy = require './rebalanceStrategies/StandaloneStrategy'
+rebalanceStrategy = require './rebalanceStrategy'
 
 
 ###
@@ -42,9 +42,8 @@ module.exports = class TopicConsumer extends Readable
     @consumerGroup = consumerGroup
     @consumerId = options.consumerId || uuid.v1()
 
-    rebalanceStrategy = options.rebalanceStrategy || StandaloneStrategy
-    @rebalancer = new rebalanceStrategy @connections, @consumerGroup, @topic, @consumerId
-    @rebalancer.on 'partitions', @rebalance
+    @rebalanceStrategy = options.rebalanceStrategy || rebalanceStrategy.standAlone
+    @on 'partitions', @rebalance
 
     @partitionConsumers = {}
 
@@ -66,7 +65,7 @@ module.exports = class TopicConsumer extends Readable
     This is done via the ```partitions``` event, that fires #rebalance
   ###
   connect: ->
-    @rebalancer.connect()
+    @rebalanceStrategy.apply @
 
 
   ###

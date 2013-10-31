@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "rebalanceStrategy.js",
+  "sourceRoot": "../../../coffee/src/lib/",
+  "sources": [
+    "rebalanceStrategy.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;;;;;;;CAAA;CAQA;;;;;;;;CARA;AAgBA,CAhBA,EAgBqB,IAAd,EAAc,CAArB;CAEI,KAAA,SAAA;KAAA,OAAA;CAAA,CAAA,CAAW,CAAC,IAAZ,GAAuB;CAAvB,CACA,CAAQ,CAAC,CAAT;CAES,CAAoC,CAAA,EAA7C,GAAQ,CAAR,CAA6C,kBAA7C;CACE,EAAA,CAAA;CAAA,CAAsB,CAAf,CAAA,CAAC,EAAD,MAAA;MAAP;CACC,CAAmB,EAApB,CAAC,KAAD,CAAA,CAAA;CAFF,EAA6C;CAL5B"
+}

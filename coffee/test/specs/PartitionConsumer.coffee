@@ -6,6 +6,8 @@ mockery = require 'mockery'
 should = require 'should'
 sinon = require 'sinon'
 _ = require 'underscore'
+FakeProzess = require '../../src/lib/FakeProzess'
+
 
 describe 'PartitionConsumer class', ->
   ProzessStub = ProzessConsumerStub = ZookeeperClientStub = TopicConsumerStub = null
@@ -21,7 +23,7 @@ describe 'PartitionConsumer class', ->
     p = new PartitionConsumer given['topic consumer instance'], given['partition details'], options
     p.on 'error', (msg, detail) ->
       throw Error "should not be happening: #{msg} / #{util.inspect(detail)}"
-    p
+    return p
 
   before ->
     class ProzessConsumerStub

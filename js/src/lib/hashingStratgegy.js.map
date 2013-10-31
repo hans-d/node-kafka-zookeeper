@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "hashingStratgegy.js",
+  "sourceRoot": "../../../coffee/src/lib/",
+  "sources": [
+    "hashingStratgegy.coffee"
+  ],
+  "names": [],
+  "mappings": "AA2BoB"
+}

@@ -1,6 +1,6 @@
 // This file has been generated from coffee source files
 
-var concat, mockery, should, sinon, stream, util, _,
+var FakeProzess, concat, mockery, should, sinon, stream, util, _,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 stream = require('stream');
@@ -16,6 +16,8 @@ should = require('should');
 sinon = require('sinon');
 
 _ = require('underscore');
+
+FakeProzess = require('../../src/lib/FakeProzess');
 
 describe('PartitionConsumer class', function() {
   var DEFAULT_NOMSG_TIMEOUT, PartitionConsumer, ProzessConsumerStub, ProzessStub, TopicConsumerStub, ZookeeperClientStub, createTestPartitionConsumer, fakeClock, given, partitionConsumer;

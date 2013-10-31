@@ -26,16 +26,9 @@ describe('Topic consumer', function() {
   uuidV1Stub = null;
   StrategyStub = PartitionConsumerStub = NodeUuidStub = null;
   before(function() {
-    StrategyStub = (function() {
-      function StrategyStub() {}
-
-      StrategyStub.prototype.on = function() {};
-
-      StrategyStub.prototype.connect = function() {};
-
-      return StrategyStub;
-
-    })();
+    StrategyStub = {
+      standAlone: function() {}
+    };
     PartitionConsumerStub = (function(_super) {
       __extends(PartitionConsumerStub, _super);
 
@@ -65,7 +58,7 @@ describe('Topic consumer', function() {
     });
     mockery.registerMock('node-uuid', NodeUuidStub);
     mockery.registerMock('./PartitionConsumer', PartitionConsumerStub);
-    mockery.registerMock('./rebalanceStrategies/StandaloneStrategy', StrategyStub);
+    mockery.registerMock('./rebalanceStrategy', StrategyStub);
     mockery.registerAllowables(['stream', 'util', 'async', 'underscore', 'zlib', 'crypto', './Compression', '../../src/lib/TopicConsumer']);
     return TopicConsumer = require('../../src/lib/TopicConsumer');
   });
@@ -118,23 +111,18 @@ describe('Topic consumer', function() {
       topicConsumer.topic.should.equal('foo');
       topicConsumer.consumerId.should.equal(uuidV1Stub);
       topicConsumer.partitionConsumers.should.eql({});
-      return topicConsumer.rebalancer.should.be.instanceOf(StrategyStub);
+      return topicConsumer.rebalanceStrategy.should.be.equal(StrategyStub.standAlone);
     });
-    it('can be given a strategy class', function() {
-      var StrategyStub2;
-      StrategyStub2 = (function() {
-        function StrategyStub2() {}
-
-        StrategyStub2.prototype.on = function() {};
-
-        return StrategyStub2;
-
-      })();
+    it('can be given a rebalancer strategy', function() {
+      var strategy;
+      strategy = function() {
+        return this.emit('error', 'not called');
+      };
       topicConsumer = new TopicConsumer(zkClientStub, 'groupA', 'foo', {
-        rebalanceStrategy: StrategyStub2
+        rebalanceStrategy: strategy
       });
-      topicConsumer.rebalancer.should.not.be.instanceOf(StrategyStub);
-      return topicConsumer.rebalancer.should.be.instanceOf(StrategyStub2);
+      topicConsumer.rebalanceStrategy.should.not.be.equal(StrategyStub.standAlone);
+      return topicConsumer.rebalanceStrategy.should.be.equal(strategy);
     });
     return it('should stream data via preprocess', function(done) {
       topicConsumer.on('data', function(data) {
@@ -154,10 +142,10 @@ describe('Topic consumer', function() {
     });
   });
   describe('#connect', function() {
-    return it('should connect the used rebalance strategy', function() {
-      sinon.spy(topicConsumer.rebalancer, 'connect');
+    return it('should call the used rebalance strategy', function() {
+      sinon.stub(topicConsumer, 'rebalanceStrategy');
       topicConsumer.connect();
-      return topicConsumer.rebalancer.connect.calledOnce.should.be["true"];
+      return topicConsumer.rebalanceStrategy.calledOnce.should.be["true"];
     });
   });
   describe('#rebalance', function() {

@@ -3,8 +3,7 @@
 _ = require 'underscore'
 zookeeper = require 'zookeeper-hd'
 
-TopicConsumer = require './TopicConsumer'
-ZooKafka = require './ZooKafka'
+Connections = require './Connections'
 
 ###
   Higher level client for kafka, that interacts with zookeeper.
@@ -45,13 +44,7 @@ module.exports = class Kafkazoo extends EventEmitter
     @config = _.omit options, zookeeper
 
 
-    @connections = () ->
-      # make it an object, so its passed by reference
-
-    @connections.zooKafka = new ZooKafka this._zookeeper
-    @connections.topicConsumer = {}
-    @connections.topicProducer = {}
-    @connections.brokerProducer = {}
+    @connections = new Connections @_zookeeper
 
 
   ###
@@ -83,9 +76,7 @@ module.exports = class Kafkazoo extends EventEmitter
     @return {Object} {@link TopicConsumer}
   ###
   createConsumer: (topic, consumerGroup, options) ->
-    return @connections.topicConsumer[ "#{consumerGroup}-#{topic}" ] =
-        new TopicConsumer @connections, consumerGroup, topic, options
-
+    return @connections.newTopicConsumer consumerGroup, topic, options
 
   ###
     Creates a producer for given topic
