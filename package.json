@@ -35,16 +35,16 @@
     "node": ">=0.10.18"
   },
   "dependencies": {
-    "async": "0.2.x",
-    "bignum": "0.6.x",
-    "node-uuid": "~1.4.x",
-    "prozess": "0.6.x",
-    "underscore": "1.5.x",
-    "underscore.string": "2.3.x",
-    "zookeeper-hd": "~0.3.x"
+    "async": "~0.2",
+    "bignum": "~0.6",
+    "node-uuid": "~1.4",
+    "prozess": "~0.6",
+    "underscore": "~1.5",
+    "underscore.string": "~2.3",
+    "zookeeper-hd": "^0.5.1"
   },
   "devDependencies": {
-    "blanket": "~1.1.5",
+    "blanket": "~1.1",
     "buffermaker": "~1.0",
     "concat-stream": "~1.0",
     "glob": "~3.2",
@@ -64,6 +64,7 @@
     "shelljs": "~0.2",
     "should": "~1.1",
     "sinon": "~1.5",
-    "yadda": "~0.8"
+    "yadda": "~0.8",
+    "coffee-script": "^1.6"
   }
 }

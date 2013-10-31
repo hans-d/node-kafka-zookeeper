@@ -2,7 +2,7 @@ should = require 'should'
 sinon = require 'sinon'
 mockery = require 'mockery'
 
-{FakeZookeeper} = require 'zookeeper-hd'
+{FakeZookeeper} = require('zookeeper-hd')
 ZooKafka = require '../../src/lib/ZooKafka'
 _ = require 'underscore'
 
@@ -18,7 +18,7 @@ describe 'ZooKafka class', ->
         'events', 'path',
         'async', 'underscore',
         'zookeeper-hd',
-        './lib/SimpleClient', './lib/PlusClient', './lib/FakeZookeeper', './SimpleClient'
+        './lib/SimpleClient', './lib/PlusClient', './lib/FakeZookeeper', './SimpleClient', '..'
       ]
 
 
@@ -60,7 +60,7 @@ describe 'ZooKafka class', ->
     describe 'construct', ->
 
       it 'can be constructed', ->
-        zooKafka = new ZooKafka(client);
+        zooKafka = new ZooKafka client
 
     describe '#getAllRegisteredBrokers', ->
 

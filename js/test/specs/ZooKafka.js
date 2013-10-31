@@ -23,7 +23,7 @@ describe('ZooKafka class', function() {
       useCleanCache: true
     });
     mockery.registerMock('zookeeper', FakeZookeeper);
-    mockery.registerAllowables(['events', 'path', 'async', 'underscore', 'zookeeper-hd', './lib/SimpleClient', './lib/PlusClient', './lib/FakeZookeeper', './SimpleClient']);
+    mockery.registerAllowables(['events', 'path', 'async', 'underscore', 'zookeeper-hd', './lib/SimpleClient', './lib/PlusClient', './lib/FakeZookeeper', './SimpleClient', '..']);
     return _ref = require('zookeeper-hd'), PlusClient = _ref.PlusClient, _ref;
   });
   after(function() {
